@@ -189,7 +189,6 @@ class __main__:
 
         #terrain generation maybe
         world = TerrainGenerator()
-        world.tunnel()
         #world.hideFaces()
 
         #other shit idk
