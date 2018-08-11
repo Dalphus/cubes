@@ -105,7 +105,7 @@ class TerrainGenerator:
                          a+1>height or type(self.map_data[a+1][b][c]) != Cube,\
                          a-1<0 or type(self.map_data[a-1][b][c]) != Cube]
                     
-                    self.map_data[a][b][c].face_visible = x
+                    self.map_data[a][b][c].covered = x
 
 class Cube:
     #texture yet to be implemented
@@ -114,12 +114,11 @@ class Cube:
         self.color = texture
         self.pos = position
         #north,east,south,west,up,down
-        self.face_visible = [1,1,1,1,1,1]
-        #is_covered
-        #is_visible
+        self.covered = [1,1,1,1,1,1]
+        self.visible = [1,1,1,1,1,1]
     def relative_faces(self,pos):
         x = [self.pos[2]<pos[2],self.pos[0]<pos[0],self.pos[2]>pos[2],self.pos[0]>pos[0],-self.pos[1]>pos[1],-self.pos[1]<pos[1]]
-        self.face_visible = x
+        self.visible = x
         
 #calculates and draws polygons
 class Render:
@@ -139,7 +138,7 @@ class Render:
         draw_queue = []
         for cube in cubes:
             for face in range(0,len(faces)):
-                if not cube.face_visible[face]: continue
+                if not cube.covered[face] or not cube.visible[face]: continue
                 total_dist = 0
                 points = []
                 can_draw = True
