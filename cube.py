@@ -189,6 +189,7 @@ class __main__:
 
         #terrain generation maybe
         world = TerrainGenerator()
+        world.one()
         #world.hideFaces()
 
         #other shit idk
