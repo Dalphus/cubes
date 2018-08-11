@@ -115,8 +115,10 @@ class Cube:
         self.pos = position
         #north,east,south,west,up,down
         self.face_visible = [1,1,1,1,1,1]
+        #is_covered
+        #is_visible
     def relative_faces(self,pos):
-        x = [self.pos[2]<pos[2],self.pos[0]<pos[0],self.pos[2]>pos[2],self.pos[0]>pos[0],1,self.pos[1]>pos[1]]
+        x = [self.pos[2]<pos[2],self.pos[0]<pos[0],self.pos[2]>pos[2],self.pos[0]>pos[0],-self.pos[1]>pos[1],-self.pos[1]<pos[1]]
         self.face_visible = x
         
 #calculates and draws polygons
