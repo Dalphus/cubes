@@ -36,16 +36,11 @@ class Player:
         #up/down
         if key[pygame.K_SPACE]: dy += dt
         if key[pygame.K_LSHIFT]: dy -= dt
-
-        if 0<self.y<10 and 0<self.z<10:
-            if not 0<self.x+dx<10: self.x += dx
-        else: self.x += dx
-        if 0<self.x<10 and 0<self.z<10:
-            if not 0<self.y+dy<10: self.y += dy
-        else: self.y += dy
-        if 0<self.x<10 and 0<self.y<10:
-            if not 0<self.z+dz<10: self.z += dz
-        else: self.z += dz
+        
+        rx,ry,rz = (0<self.x<10,0<self.y<10,0<self.z<10)
+        if not(ry and rz and 0<self.x+dx<10): self.x += dx
+        if not(rx and rz and 0<self.y+dy<10): self.y += dy
+        if not(rx and ry and 0<self.z+dz<10): self.z += dz
         
         #looking around
         if key[pygame.K_LEFT]: self.yaw -= dt
