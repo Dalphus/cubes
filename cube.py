@@ -17,24 +17,36 @@ class Player:
         self.x,self.y,self.z = position
         self.yaw,self.pitch = rotation
     
-    def update(self,key,dt):
+    def update(self,world,key,dt):
         s,c = math.sin(self.yaw),math.cos(self.yaw)
         #wasd movement relative to camera angle
+        dx,dy,dz = (0,0,0)
         if key[pygame.K_w]:
-            self.z += dt*c
-            self.x += dt*s
+            dz += dt*c
+            dx += dt*s
         if key[pygame.K_s]:
-            self.z -= dt*c
-            self.x -= dt*s
+            dz -= dt*c
+            dx -= dt*s
         if key[pygame.K_d]:
-            self.z -= dt*s
-            self.x += dt*c
+            dz -= dt*s
+            dx += dt*c
         if key[pygame.K_a]:
-            self.z += dt*s
-            self.x -= dt*c
+            dz += dt*s
+            dx -= dt*c
         #up/down
-        if key[pygame.K_SPACE]: self.y -= dt
-        if key[pygame.K_LSHIFT]: self.y += dt
+        if key[pygame.K_SPACE]: dy += dt
+        if key[pygame.K_LSHIFT]: dy -= dt
+
+        if 0<self.y<10 and 0<self.z<10:
+            if not 0<self.x+dx<10: self.x += dx
+        else: self.x += dx
+        if 0<self.x<10 and 0<self.z<10:
+            if not 0<self.y+dy<10: self.y += dy
+        else: self.y += dy
+        if 0<self.x<10 and 0<self.y<10:
+            if not 0<self.z+dz<10: self.z += dz
+        else: self.z += dz
+        
         #looking around
         if key[pygame.K_LEFT]: self.yaw -= dt
         if key[pygame.K_RIGHT]: self.yaw += dt
@@ -117,7 +129,7 @@ class Cube:
         self.covered = [1,1,1,1,1,1]
         self.visible = [1,1,1,1,1,1]
     def relative_faces(self,pos):
-        x = [self.pos[2]<pos[2],self.pos[0]<pos[0],self.pos[2]>pos[2],self.pos[0]>pos[0],-self.pos[1]>pos[1],-self.pos[1]<pos[1]]
+        x = [self.pos[2]<pos[2],self.pos[0]<pos[0],self.pos[2]>pos[2],self.pos[0]>pos[0],self.pos[1]<pos[1],self.pos[1]>pos[1]]
         self.visible = x
         
 #calculates and draws polygons
@@ -146,13 +158,15 @@ class Render:
                     x,y,z = cube.pos
                     x1,y1,z1 = verticies[vertex]
                     x+=x1;y+=y1;z+=z1
-                    y*=-1
+                    
                     total_dist += Render.distance3D((x,y,z),player.pos())
                     
                     #player position displacment
                     x -= player.x
                     y -= player.y
                     z -= player.z
+
+                    y*= -1
                     #camera rotation
                     x,z = Render.rotate2D((x,z),player.yaw)
                     z,y = Render.rotate2D((z,y),player.pitch)
@@ -193,7 +207,7 @@ class __main__:
 
         #other shit idk
         draw_thingy = Render()
-        Mae_Weller = Player((0,0,-5))
+        steve = Player((-5,-5,-5))
         font = pygame.font.SysFont('Courier', 20)
         
         #game loop
@@ -206,17 +220,18 @@ class __main__:
                     pygame.quit(); sys.exit()
 
             for a in world.cube_list:
-                a.relative_faces(Mae_Weller.pos())
+                a.relative_faces(steve.pos())
             
             #outsourcing graphics to Render object
             window.fill((255,255,255))
-            draw_thingy.render(window,world.cube_list,Mae_Weller)
+            draw_thingy.render(window,world.cube_list,steve)
 
             #print out fps
-            fps = font.render(str(int(clock.get_fps())),True,(0,255,0))
+            #fps = font.render(str(int(clock.get_fps())),True,(0,255,0))
+            fps = font.render(str((int(steve.x),int(steve.y),int(steve.z))),True,(0,255,0))
             window.blit(fps,(20,20))
     
             pygame.display.flip()
-            Mae_Weller.update(pygame.key.get_pressed(),dt)
+            steve.update(world,pygame.key.get_pressed(),dt)
 __main__()
 
