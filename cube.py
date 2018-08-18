@@ -20,7 +20,7 @@ class Player:
     def update(self,world,key,dt):
         s,c = math.sin(self.yaw),math.cos(self.yaw)
         #wasd movement relative to camera angle
-        dx,dy,dz = (0,0,0)
+        dx,dy,dz = (0,-dt,0)
         if key[pygame.K_w]:
             dz += dt*c
             dx += dt*s
@@ -34,13 +34,12 @@ class Player:
             dz += dt*s
             dx -= dt*c
         #up/down
-        if key[pygame.K_SPACE]: dy += dt
-        if key[pygame.K_LSHIFT]: dy -= dt
-        
-        rx,ry,rz = (0<self.x<10,0<self.y<10,0<self.z<10)
-        if not(ry and rz and 0<self.x+dx<10): self.x += dx
-        if not(rx and rz and 0<self.y+dy<10): self.y += dy
-        if not(rx and ry and 0<self.z+dz<10): self.z += dz
+        if key[pygame.K_SPACE]: dy += 1
+        #if key[pygame.K_LSHIFT]: dy -= dt
+
+        if dx and type(world.map_data[int(self.y)][int(self.x+(dx/abs(dx))*.3)][int(self.z)]) != Cube: self.x += dx
+        if dy and type(world.map_data[int(self.y+(dy/abs(dy))*1.5)][int(self.x)][int(self.z)]) != Cube: self.y += dy
+        if dz and type(world.map_data[int(self.y)][int(self.x)][int(self.z+(dz/abs(dz))*.3)]) != Cube: self.z += dz
         
         #looking around
         if key[pygame.K_LEFT]: self.yaw -= dt
@@ -60,11 +59,11 @@ class TerrainGenerator:
         self.cube_list = []
     #generates flat plane of cube objects
     def flat(self):
-        for i in range(0,2):
+        for i in range(0,1):
             self.map_data.append([])
-            for j in range(0,10):
+            for j in range(0,21):
                 self.map_data[i].append([])
-                for k in range(0,10):
+                for k in range(0,21):
                     self.map_data[i][j].append(Cube((j,i,k),(15,255,50)))
                     self.cube_list.append(self.map_data[i][j][k])
     #adds ridges to a flat plane
@@ -94,6 +93,17 @@ class TerrainGenerator:
                     else:
                         self.map_data[i][j].append(Cube((j,i,k),(15,255,50)))
                         self.cube_list.append(self.map_data[i][j][k])
+    def pillars(self):
+        self.flat()
+        for i in range(1,12):
+            self.map_data.append([])
+            for j in range(0,21):
+                self.map_data[i].append([])
+                for k in range(0,21):
+                    if not((j-1)%3 or (k-1)%3):
+                        self.map_data[i][j].append(Cube((j,i,k),(15,255,50)))
+                        self.cube_list.append(self.map_data[i][j][k])
+                    else: self.map_data[i][j].append(None)
 
     #hides cube faces covered by other cubes
     def hideFaces(self):
@@ -189,7 +199,7 @@ class __main__:
     
     def __init__(self):
         #screen variables
-        w,h = 400,400
+        w,h = 512,512
 
         #pygame shit
         window = pygame.display.set_mode((w,h))
@@ -197,12 +207,12 @@ class __main__:
 
         #terrain generation maybe
         world = TerrainGenerator()
-        world.tunnel()
+        world.pillars()
         world.hideFaces()
 
         #other shit idk
         draw_thingy = Render()
-        steve = Player((-5,-5,-5))
+        steve = Player((5,5,5))
         font = pygame.font.SysFont('Courier', 20)
         
         #game loop
