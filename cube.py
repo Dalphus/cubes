@@ -18,6 +18,7 @@ class Player:
         self.yaw,self.pitch = rotation
     
     def update(self,world,key,dt):
+        global fov
         s,c = math.sin(self.yaw),math.cos(self.yaw)
         #wasd movement relative to camera angle
         dx,dy,dz = (0,0,0)
@@ -158,7 +159,7 @@ class Render:
                 if not cube.covered[face] or not cube.visible[face]: continue
                 total_dist = 0
                 points = []
-                can_draw = True
+                can_draw = 0
                 for vertex in faces[face]:
                     x,y,z = cube.pos
                     x1,y1,z1 = verticies[vertex]
@@ -182,14 +183,11 @@ class Render:
                         x *= f
                         y *= f
                         points.append((w+int(x),h+int(y)))
-                    else
-                        x += w; y += h
-                        if x<0: x = 0
-                        elif x>w*2: x = w*2
-                        if y<0: y = 0
-                        elif x>y*2: x = y*2
+                        can_draw += 1
+                    else:
+                        points.append((w+int(x),h+int(y)))
                         
-                if can_draw:
+                if can_draw > 0:
                     draw_queue.append((total_dist,points,colors[face]))
 
         #draws polygons
@@ -233,6 +231,7 @@ class __main__:
             #outsourcing graphics to Render object
             window.fill((255,255,255))
             Render.render(window,world.cube_list,steve)
+            pygame.draw.circle(window,(0,255,255),(256,256),3)
 
             #print out fps
             #fps = font.render(str(int(clock.get_fps())),True,(0,255,0))
