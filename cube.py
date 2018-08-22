@@ -185,7 +185,11 @@ class Render:
                         points.append((w+int(x),h+int(y)))
                         can_draw += 1
                     else:
-                        points.append((w+int(x),h+int(y)))
+                        if x < 0: x = 0
+                        elif x > 0: x = 2*w
+                        if y < 0: y = 0
+                        elif y > 0: y = 2*h
+                        points.append((int(x),int(y)))
                         
                 if can_draw > 0:
                     draw_queue.append((total_dist,points,colors[face]))
@@ -231,7 +235,7 @@ class __main__:
             #outsourcing graphics to Render object
             window.fill((255,255,255))
             Render.render(window,world.cube_list,steve)
-            pygame.draw.circle(window,(0,255,255),(256,256),3)
+            pygame.draw.circle(window,(0,0,0),(256,256),3)
 
             #print out fps
             #fps = font.render(str(int(clock.get_fps())),True,(0,255,0))
