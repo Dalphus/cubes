@@ -20,7 +20,7 @@ class Player:
     def update(self,world,key,dt):
         s,c = math.sin(self.yaw),math.cos(self.yaw)
         #wasd movement relative to camera angle
-        dx,dy,dz = (0,-dt,0)
+        dx,dy,dz = (0,0,0)
         if key[pygame.K_w]:
             dz += dt*c
             dx += dt*s
@@ -34,9 +34,9 @@ class Player:
             dz += dt*s
             dx -= dt*c
         #up/down
-        if key[pygame.K_SPACE]: dy += 1
-        #if key[pygame.K_LSHIFT]: dy -= dt
-
+        if key[pygame.K_SPACE]: dy += dt
+        if key[pygame.K_LSHIFT]: dy -= dt
+        
         if dx and type(world.map_data[int(self.y)][int(self.x+(dx/abs(dx))*.3)][int(self.z)]) != Cube: self.x += dx
         if dy and type(world.map_data[int(self.y+(dy/abs(dy))*1.5)][int(self.x)][int(self.z)]) != Cube: self.y += dy
         if dz and type(world.map_data[int(self.y)][int(self.x)][int(self.z+(dz/abs(dz))*.3)]) != Cube: self.z += dz
@@ -148,7 +148,7 @@ class Render:
         x = math.hypot(pos1[0]-pos2[0],pos1[2]-pos2[2])
         return math.hypot(x,pos1[1]-pos2[1])**2
     
-    def render(self,window,cubes,player):
+    def render(window,cubes,player):
         w,h = list(window.get_rect())[2:]
         w //= 2
         h //= 2
@@ -177,14 +177,18 @@ class Render:
                     z,y = Render.rotate2D((z,y),player.pitch)
                     
                     #depth compensation
-                    if z <= .01:
-                        can_draw = False
-                        break
-                    f = 200/z
-                    x *= f
-                    y *= f
-                
-                    points.append((w+int(x),h+int(y)))
+                    if z > .01:
+                        f = 200/z
+                        x *= f
+                        y *= f
+                        points.append((w+int(x),h+int(y)))
+                    else
+                        x += w; y += h
+                        if x<0: x = 0
+                        elif x>w*2: x = w*2
+                        if y<0: y = 0
+                        elif x>y*2: x = y*2
+                        
                 if can_draw:
                     draw_queue.append((total_dist,points,colors[face]))
 
@@ -211,7 +215,6 @@ class __main__:
         world.hideFaces()
 
         #other shit idk
-        draw_thingy = Render()
         steve = Player((5,5,5))
         font = pygame.font.SysFont('Courier', 20)
         
@@ -229,7 +232,7 @@ class __main__:
             
             #outsourcing graphics to Render object
             window.fill((255,255,255))
-            draw_thingy.render(window,world.cube_list,steve)
+            Render.render(window,world.cube_list,steve)
 
             #print out fps
             #fps = font.render(str(int(clock.get_fps())),True,(0,255,0))
