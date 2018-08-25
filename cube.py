@@ -37,10 +37,13 @@ class Player:
         #up/down
         if key[pygame.K_SPACE]: dy += dt
         if key[pygame.K_LSHIFT]: dy -= dt
-        
-        if dx and type(world.map_data[int(self.y)][int(self.x+(dx/abs(dx))*.3)][int(self.z)]) != Cube: self.x += dx
-        if dy and type(world.map_data[int(self.y+(dy/abs(dy))*1.5)][int(self.x)][int(self.z)]) != Cube: self.y += dy
-        if dz and type(world.map_data[int(self.y)][int(self.x)][int(self.z+(dz/abs(dz))*.3)]) != Cube: self.z += dz
+
+        if 0 < self.x+dx < len(world.map_data[0])-1 and 0 < self.y+dy < len(world.map_data)-1 and 0 < self.z+dz < len(world.map_data[0][0])-1:
+            if dx and type(world.map_data[int(self.y)][int(self.x+(dx/abs(dx))*.3)][int(self.z)]) != Cube: self.x += dx
+            if dy and type(world.map_data[int(self.y+(dy/abs(dy))*1.5)][int(self.x)][int(self.z)]) != Cube: self.y += dy
+            if dz and type(world.map_data[int(self.y)][int(self.x)][int(self.z+(dz/abs(dz))*.3)]) != Cube: self.z += dz
+        else:
+            self.x += dx; self.y += dy; self.z += dz
         
         #looking around
         if key[pygame.K_LEFT]: self.yaw -= dt
@@ -238,8 +241,8 @@ class __main__:
             pygame.draw.circle(window,(0,0,0),(256,256),3)
 
             #print out fps
-            #fps = font.render(str(int(clock.get_fps())),True,(0,255,0))
-            fps = font.render(str((int(steve.x),int(steve.y),int(steve.z))),True,(0,255,0))
+            fps = font.render(str(int(clock.get_fps())),True,(0,255,0))
+            #fps = font.render(str((int(steve.x),int(steve.y),int(steve.z))),True,(0,255,0))
             window.blit(fps,(20,20))
     
             pygame.display.flip()
