@@ -34,12 +34,10 @@ class Player:
             self.x += dx; self.y += dy; self.z += dz
         
         #looking around
-        if key[pygame.K_LEFT]: self.yaw -= dt
-        if key[pygame.K_RIGHT]: self.yaw += dt
-        if key[pygame.K_UP] and self.pitch < math.pi/2-.2:
-            self.pitch += dt
-        if key[pygame.K_DOWN] and self.pitch > -1*math.pi/2+.2:
-            self.pitch -= dt
+        mouse = pygame.mouse.get_rel()
+        self.yaw += mouse[0]/(dt*250)
+        if -math.pi/2+.2 < self.pitch-mouse[1]/(dt*250) < math.pi/2-.2:
+            self.pitch -= mouse[1]/(dt*250)
             
     def pos(self):
         return (self.x,self.y,self.z)
