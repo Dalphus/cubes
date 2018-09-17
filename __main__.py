@@ -34,10 +34,13 @@ class __main__:
                     if e.key == pygame.K_ESCAPE:
                         paused = not paused
                         pygame.event.set_grab(not paused)
-##                        pygame.mouse.set_visible(paused)
+                        pygame.mouse.set_visible(paused)
+                elif not paused and e.type == pygame.MOUSEMOTION:
+                    steve.mouse_event(e,dt)
+
             if not paused:
                 pygame.mouse.set_pos(256,256)
-                pygame.mouse.get_rel()
+                pygame.event.clear(pygame.MOUSEMOTION)
             
             for cube in world.cube_list:
                 cube.relative_faces(steve.pos())

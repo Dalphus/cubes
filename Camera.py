@@ -32,12 +32,13 @@ class Player:
             if dz and type(world.map_data[int(self.y)][int(self.x)][int(self.z+(dz/abs(dz))*.3)]) != Cube: self.z += dz
         else:
             self.x += dx; self.y += dy; self.z += dz
-        
+    
+    def mouse_event(self,event,dt):
         #looking around
-        mouse = pygame.mouse.get_rel()
-        self.yaw += mouse[0]/(dt*250)
-        if -math.pi/2+.2 < self.pitch-mouse[1]/(dt*250) < math.pi/2-.2:
-            self.pitch -= mouse[1]/(dt*250)
+        dx,dy = event.rel
+        self.yaw += dx/(dt*250)
+        if -math.pi/2+.2 < self.pitch-dy/(dt*250) < math.pi/2-.2:
+            self.pitch -= dy/(dt*250)
             
     def pos(self):
         return (self.x,self.y,self.z)
