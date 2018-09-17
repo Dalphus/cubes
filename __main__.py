@@ -3,14 +3,10 @@ from Terrain import TerrainGenerator
 from Camera import Player
 from Draw import Render
 pygame.init()
-
   
 class __main__:
     
     def __init__(self,w,h):
-        #screen variables
-        w,h = 512,512
-
         #pygame shit
         window = pygame.display.set_mode((w,h))
         clock = pygame.time.Clock()
@@ -26,17 +22,17 @@ class __main__:
         
         #game loop
         while True:
-            #time since last call, in millis maybe
             dt = clock.tick()/200
-            
+
+            kb = pygame.key.get_pressed()
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
-                    pygame.quit(); sys.exit()
+                    pygame.quit; sys.exit()
 
-            for a in world.cube_list:
-                a.relative_faces(steve.pos())
+            for cube in world.cube_list:
+                cube.relative_faces(steve.pos())
             
-            #outsourcing graphics to Render object
+            #graphics
             window.fill((255,255,255))
             Render.render(window,world.cube_list,steve)
             pygame.draw.circle(window,(0,0,0),(256,256),3)
@@ -47,6 +43,7 @@ class __main__:
             window.blit(fps,(20,20))
     
             pygame.display.flip()
-            steve.update(world,pygame.key.get_pressed(),dt)
+            steve.update(world,kb,dt)
+
 __main__(512,512)
 

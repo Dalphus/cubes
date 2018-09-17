@@ -7,7 +7,6 @@ class Player:
         self.yaw,self.pitch = rotation
     
     def update(self,world,key,dt):
-        global fov
         s,c = math.sin(self.yaw),math.cos(self.yaw)
         #wasd movement relative to camera angle
         dx,dy,dz = (0,0,0)
