@@ -1,11 +1,13 @@
 import pygame, sys, math
-import Terrain, Draw, Player
+from Terrain import TerrainGenerator
+from Camera import Player
+from Draw import Render
 pygame.init()
 
   
 class __main__:
     
-    def __init__(self):
+    def __init__(self,w,h):
         #screen variables
         w,h = 512,512
 
@@ -46,5 +48,5 @@ class __main__:
     
             pygame.display.flip()
             steve.update(world,pygame.key.get_pressed(),dt)
-__main__()
+__main__(512,512)
 

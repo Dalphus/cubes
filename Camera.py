@@ -1,4 +1,5 @@
 import pygame, math
+from Terrain import Cube
 
 class Player:
     def __init__(self,position=(0,0,0),rotation=(0,0)):
