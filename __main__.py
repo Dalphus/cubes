@@ -34,14 +34,13 @@ class __main__:
                 if e.key == pygame.K_ESCAPE:
                     paused = not paused
                     pygame.event.set_grab(not paused)
-                    pygame.mouse.set_visible(paused)
+                    #pygame.mouse.set_visible(paused)
                     print(paused)
-            for e in get_input.mousemotion():
-                steve.mouse_event(e,dt)
 
             if not paused:
                 pygame.mouse.set_pos(256,256)
                 pygame.event.clear(pygame.MOUSEMOTION)
+                steve.update(world,dt)
             
             for cube in world.cube_list:
                 cube.relative_faces(steve.pos())
@@ -49,7 +48,7 @@ class __main__:
             #graphics
             window.fill((255,255,255))
             Render.render(window,world.cube_list,steve)
-            pygame.draw.circle(window,(0,0,0),(256,256),3)
+            pygame.draw.circle(window,(0,0,0),(w//2,h//2),3)
 
             #print out fps
             fps = font.render(str(int(clock.get_fps())),True,(0,255,0))
@@ -57,7 +56,6 @@ class __main__:
             window.blit(fps,(20,20))
     
             pygame.display.flip()
-            steve.update(world,dt)
 
 __main__(512,512)
 

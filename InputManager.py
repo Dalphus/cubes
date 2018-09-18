@@ -1,5 +1,7 @@
 import pygame,sys
 
+#making this class static would mean you don't have
+#to pass it into other classe. @classmethod maybe?
 class InputManager:
     def __init__(self):
         pygame.event.set_allowed([pygame.KEYDOWN,\

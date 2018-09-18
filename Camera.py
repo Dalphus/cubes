@@ -24,6 +24,9 @@ class Player:
                 if e.key == self.keys[i]:
                     self.movement[i] = 0
                     break
+        #mouse movement
+        for e in self.get_input.mousemotion():
+            self.mouse_event(e,dt)
 
         #wasd movement relative to camera angle     
         dx,dy,dz = (0,0,0)
