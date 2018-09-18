@@ -19,7 +19,9 @@ class __main__:
 
         #other shit idk
         get_input = InputManager()
-        steve = Player(get_input,(5,5,5))
+        p1 = Player(get_input,(5,5,5))
+        p2 = Player(get_input)
+        current_player = 1
         font = pygame.font.SysFont('Courier', 20)
         paused = True
         
@@ -36,18 +38,29 @@ class __main__:
                     pygame.event.set_grab(not paused)
                     #pygame.mouse.set_visible(paused)
                     print(paused)
+                elif e.key == pygame.K_1:
+                    current_player = 1
+                elif e.key == pygame.K_2:
+                    current_player = 2
 
             if not paused:
                 pygame.mouse.set_pos(256,256)
                 pygame.event.clear(pygame.MOUSEMOTION)
-                steve.update(world,dt)
-            
-            for cube in world.cube_list:
-                cube.relative_faces(steve.pos())
+                if current_player == 1:
+                    p1.update(world,dt)
+                elif current_player == 2:
+                    p2.update(world,dt)
+
+            if current_player == 1:
+                for cube in world.cube_list:
+                    cube.relative_faces(p1.pos())
             
             #graphics
             window.fill((255,255,255))
-            Render.render(window,world.cube_list,steve)
+            if current_player == 1:
+                Render.render(window,world.cube_list,p1)
+            elif current_player == 2:
+                Render.render(window,world.cube_list,p2)
             pygame.draw.circle(window,(0,0,0),(w//2,h//2),3)
 
             #print out fps

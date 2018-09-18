@@ -69,3 +69,6 @@ class Render:
         for i in range(0,len(draw_queue)):
             a,b,c = draw_queue[i]
             pygame.draw.polygon(window,c,b)
+
+    def render_player(player,,player2):
+        pass
