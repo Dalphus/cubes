@@ -2,6 +2,7 @@ import pygame, sys, math
 from Terrain import TerrainGenerator
 from Camera import Player
 from Draw import Render
+from InputManager import InputManager
 pygame.init()
   
 class __main__:
@@ -17,7 +18,8 @@ class __main__:
         world.hideFaces()
 
         #other shit idk
-        steve = Player((5,5,5))
+        get_input = InputManager()
+        steve = Player(get_input,(5,5,5))
         font = pygame.font.SysFont('Courier', 20)
         paused = True
         
@@ -26,17 +28,16 @@ class __main__:
             dt = clock.tick()/200
 
             #input shenanagins
-            kb = pygame.key.get_pressed()
-            if pygame.event.peek(pygame.QUIT):
-                pygame.display.quit();pygame.quit();sys.exit()
-            for e in pygame.event.get():
-                if e.type == pygame.KEYDOWN:
-                    if e.key == pygame.K_ESCAPE:
-                        paused = not paused
-                        pygame.event.set_grab(not paused)
-                        pygame.mouse.set_visible(paused)
-                elif not paused and e.type == pygame.MOUSEMOTION:
-                    steve.mouse_event(e,dt)
+            get_input.manage_input()
+            
+            for e in get_input.keydown():
+                if e.key == pygame.K_ESCAPE:
+                    paused = not paused
+                    pygame.event.set_grab(not paused)
+                    pygame.mouse.set_visible(paused)
+                    print(paused)
+            for e in get_input.mousemotion():
+                steve.mouse_event(e,dt)
 
             if not paused:
                 pygame.mouse.set_pos(256,256)
@@ -56,7 +57,7 @@ class __main__:
             window.blit(fps,(20,20))
     
             pygame.display.flip()
-            steve.update(world,kb,dt)
+            steve.update(world,dt)
 
 __main__(512,512)
 
