@@ -4,7 +4,7 @@ pygame.init()
 
 class button:
     def __init__(self,r,a,c = ((0,0,255),(10,10,255),(155,155,255))):
-        self.rect = pygame.Rect(r)
+        self.rect = r
         self.action = a
         self.colors = c
         self.hover = False
@@ -16,7 +16,8 @@ class button:
                 self.hover = False
         for e in im.mbdown():
             if self.hover:
-                print(e.buttons)
+                print(dir(e))
+                e.buttons
                 self.action()
     def bg(self):
         if self.hover:
