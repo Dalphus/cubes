@@ -1,46 +1,52 @@
 import pygame,sys
+from Input import InputManager as im
 pygame.init()
 
 class button:
-    def __init__(self):
-        self.rect = Rect(100,100,50,50)
-        self.action = test_function
+    def __init__(self,r,a,c = ((0,0,255),(10,10,255),(155,155,255))):
+        self.rect = pygame.Rect(r)
+        self.action = a
+        self.colors = c
         self.hover = False
-    def mouse_input(self,fi):
-        for e in fi[0]:
+    def update(self):
+        for e in im.mousemotion():
             if self.rect.collidepoint(e.pos):
                 self.hover = True
-            else
+            else:
                 self.hover = False
-        for e in fi[1]:
-            if e.button
+        for e in im.mbdown():
+            if self.hover:
+                print(e.buttons)
+                self.action()
+    def bg(self):
+        if self.hover:
+            return (10,10,255)
+        else:
+            return (0,0,255)
     
+class __main__:
+    
+    def test_function():
+        print("test")
+    
+    def __init__(self):
+        im.__init__()
+        
+        window = pygame.display.set_mode((512,512))
+        font = pygame.font.SysFont('Courier', 20)
 
-def test_function():
-    print("You pressed the button")
+        b1 = button(pygame.Rect(100,100,50,50),__main__.test_function)
 
-window = pygame.display.set_mode((512,512))
-font = pygame.font.SysFont('Courier', 20)
+        while True:
+            im.manage_input()
 
-b1 = pygame.Rect(100,100,200,200)
+            b1.update()
+            window.fill((255,255,255))
+            
+            pygame.draw.rect(window,b1.bg(),b1.rect)
+            
+            fps = font.render("test",True,(0,255,0))
+            window.blit(fps,(b1.rect.x,b1.rect.y))
 
-while True:
-    if pygame.event.peek(pygame.QUIT):
-        pygame.quit(),sys.exit()
-
-    filtered_input = [[],[],[]]
-    for e in pygame.event.get():
-        if e.type == pygame.MOUSEMOTION:
-            filtered_input[0].append(e)
-        elif e.type == pygame.MOUSEBUTTONDOWN:
-            filtered_input[1].append(e)
-        elif e.type == pygame.MOUSEBUTTONUP:
-            filtered_input[2].append(e)
-
-    button.mouse_input(filtered_input)
-
-    window.fill((255,255,255))
-    fps = font.render(b1.name,True,(0,255,0))
-    window.blit(fps,(100,100))
-
-    pygame.display.flip()
+            pygame.display.flip()
+__main__()
