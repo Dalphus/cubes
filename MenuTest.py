@@ -1,29 +1,27 @@
-import pygame,sys
+import pygame
 from Input import InputManager as im
 pygame.init()
 
 class button:
-    def __init__(self,r,a,c = ((0,0,255),(10,10,255),(155,155,255))):
+    def __init__(self,r,a,c = ((0,0,255),(50,50,255),(155,155,255))):
         self.rect = r
         self.action = a
         self.colors = c
         self.hover = False
+        self.held = False
     def update(self):
         for e in im.mousemotion():
-            if self.rect.collidepoint(e.pos):
-                self.hover = True
-            else:
-                self.hover = False
-        for e in im.mbdown():
-            if self.hover:
-                print(dir(e))
-                e.buttons
+            self.hover = self.rect.collidepoint(e.pos)
+        for e in im.mbup():
+            if self.hover and e.button == 1:
                 self.action()
     def bg(self):
-        if self.hover:
-            return (10,10,255)
+        if self.hover and pygame.mouse.get_pressed()[0]:
+            return self.colors[2]
+        elif self.hover:
+            return self.colors[1]
         else:
-            return (0,0,255)
+            return self.colors[0]
     
 class __main__:
     
