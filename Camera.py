@@ -1,32 +1,36 @@
 import pygame, math
 from Terrain import Cube
-from InputManager import InputManager
+from Input import InputManager as im
 
 class Player:
-    def __init__(self,im,position=(0,0,0),rotation=(0,0)):
+    def __init__(self,position=(0,0,0),rotation=(0,0)):
         self.x,self.y,self.z = position
         self.yaw,self.pitch = rotation
-        self.get_input = im
 
         self.movement = [0,0,0,0,0,0]
-        self.keys = [pygame.K_w,pygame.K_s,pygame.K_a,pygame.K_d,pygame.K_SPACE,pygame.K_LSHIFT]
+        self.keys = [pygame.K_w,pygame.K_s,pygame.K_a,pygame.K_d,\
+                     pygame.K_SPACE,pygame.K_LSHIFT]
     
     def update(self,world,dt):
         s,c = math.sin(self.yaw),math.cos(self.yaw)
         #detecting and storing keypresses
-        for e in self.get_input.keydown():
+        for e in im.keydown():
             for i in range(0,6):
                 if e.key == self.keys[i]:
                     self.movement[i] = 1
                     break
-        for e in self.get_input.keyup():
+        for e in im.keyup():
             for i in range(0,6):
                 if e.key == self.keys[i]:
                     self.movement[i] = 0
                     break
+        
         #mouse movement
-        for e in self.get_input.mousemotion():
-            self.mouse_event(e,dt)
+        for e in im.mousemotion():
+            dx,dy = e.rel
+            self.yaw += dx/(dt*250)
+            if -math.pi/2+.2 < self.pitch-dy/(dt*250) < math.pi/2-.2:
+                self.pitch -= dy/(dt*250)
 
         #wasd movement relative to camera angle     
         dx,dy,dz = (0,0,0)
@@ -52,13 +56,6 @@ class Player:
             if dz and type(world.map_data[int(self.y)][int(self.x)][int(self.z+(dz/abs(dz))*.3)]) != Cube: self.z += dz
         else:
             self.x += dx; self.y += dy; self.z += dz
-    
-    def mouse_event(self,event,dt):
-        #looking around
-        dx,dy = event.rel
-        self.yaw += dx/(dt*250)
-        if -math.pi/2+.2 < self.pitch-dy/(dt*250) < math.pi/2-.2:
-            self.pitch -= dy/(dt*250)
             
     def pos(self):
         return (self.x,self.y,self.z)
