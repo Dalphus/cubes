@@ -24,14 +24,13 @@ class __main__:
 
             #input shenanigans
             im.manage_input()
-            _keydown = im.keydown()
-            for e in _keydown:
+            for e in im.keydown():
                 if e.key == pygame.K_ESCAPE:
                     paused = not paused
                     pygame.event.set_grab(not paused)
                     #pygame.mouse.set_visible(paused)
                     print("Paused:",paused)
-                    _keydown.remove(e)
+                    #im.keydown().remove(e)
 
             window.fill((255,255,255))
             if not paused:

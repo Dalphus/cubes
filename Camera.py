@@ -28,9 +28,9 @@ class Player:
         #mouse movement
         for e in im.mousemotion():
             dx,dy = e.rel
-            self.yaw += dx/(dt*250)
+            self.yaw += dx/(dt*400)
             if -math.pi/2+.2 < self.pitch-dy/(dt*250) < math.pi/2-.2:
-                self.pitch -= dy/(dt*250)
+                self.pitch -= dy/(dt*400)
 
         #wasd movement relative to camera angle     
         dx,dy,dz = (0,0,0)
