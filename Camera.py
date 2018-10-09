@@ -1,5 +1,4 @@
 import pygame, math
-from Terrain import Cube
 from Input import InputManager as im
 
 class Player:
@@ -11,7 +10,7 @@ class Player:
         self.keys = [pygame.K_w,pygame.K_s,pygame.K_a,pygame.K_d,\
                      pygame.K_SPACE,pygame.K_LSHIFT]
     
-    def update(self,world,dt):
+    def update(self,dt):
         s,c = math.sin(self.yaw),math.cos(self.yaw)
         #detecting and storing keypresses
         for e in im.keydown():
@@ -50,12 +49,7 @@ class Player:
         if self.movement[4]: dy += dt
         if self.movement[5]: dy -= dt
 
-        if 0 < self.x+dx < len(world.map_data[0])-1 and 0 < self.y+dy < len(world.map_data)-1 and 0 < self.z+dz < len(world.map_data[0][0])-1:
-            if dx and type(world.map_data[int(self.y)][int(self.x+(dx/abs(dx))*.3)][int(self.z)]) != Cube: self.x += dx
-            if dy and type(world.map_data[int(self.y+(dy/abs(dy))*1.5)][int(self.x)][int(self.z)]) != Cube: self.y += dy
-            if dz and type(world.map_data[int(self.y)][int(self.x)][int(self.z+(dz/abs(dz))*.3)]) != Cube: self.z += dz
-        else:
-            self.x += dx; self.y += dy; self.z += dz
+        self.x += dx; self.y += dy; self.z += dz
             
     def pos(self):
         return (self.x,self.y,self.z)

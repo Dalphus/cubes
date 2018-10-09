@@ -1,6 +1,7 @@
 import pygame, sys, math
-from World import World
 from Camera import Player
+from Terrain import TerrainGenerator
+from Draw import Render
 from Input import InputManager as im
 
 class __main__:
@@ -13,10 +14,12 @@ class __main__:
 
         #variables +other cool stuff
         im.__init__()
+        Render.__init__()
         paused = False
         font = pygame.font.SysFont('Courier', 20)
-        dim1 = World(w,h)
-        p1 = Player((-5,5,-5))
+        p1 = Player((0,1,0))
+        terrain = TerrainGenerator()
+        terrain.flat()
         
         #game loop
         while True:
@@ -31,14 +34,16 @@ class __main__:
                     #pygame.mouse.set_visible(paused)
                     print("Paused:",paused)
                     #im.keydown().remove(e)
-
-            window.fill((255,255,255))
+            
+            #temporary gibberish
             if not paused:
-                p1.update(dim1.terrain,dt)
-                world_surface = dim1.update(p1,dt)
+                pygame.mouse.set_pos(256,256)
+                pygame.event.clear(pygame.MOUSEMOTION)
+                p1.update(dt)
+                Render.update(terrain.cube_list,p1)
             else:
                 pass
-            window.blit(world_surface,(0,0))
+            window.blit(Render.world_surface,(0,0))
 
             #print out fps
             fps = font.render(str(int(clock.get_fps())),True,(0,255,0))
