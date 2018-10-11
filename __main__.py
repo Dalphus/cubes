@@ -17,7 +17,7 @@ class __main__:
         #variables +other cool stuff
         im.__init__()
         Render.__init__()
-        paused = True
+        paused = False
         p1 = Player((-1,1,0))
         terrain = TerrainGenerator()
 

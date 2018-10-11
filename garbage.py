@@ -1,28 +1,25 @@
 import pygame
-from Input import InputManager as im
 
-window = pygame.display.set_mode((512,512))
-clock = pygame.time.Clock()
-im.__init__()
-
-x = False
-
-while True:
-    im.manage_input()
-    _keydown = im.keydown()
-
-    x = len(_keydown)
-    if x: print(im.keydown())
+class Test:
     
-    for e in _keydown:
-        if e.key == pygame.K_ESCAPE:
-            print("test")
-            _keydown.remove(e)
+    def __init__(self,pos):
+        self.a = pos[0]
+        self.b = pos[1]
+        self.c = pos[2]
+    def __str__(self):
+        return "Test "+str(self.a)+" "+str(self.b)+" "+str(self.c)
 
-    if x: print(im.keydown(),'\n')
-        
-    window.fill((255,255,255))
-    pygame.display.flip()
-    
-    clock.tick(1)
-        
+class __main__:
+    def __init__(self):
+        x = [Test((1,2,3)),Test((4,5,6))]
+        y = []
+        print("X: ",x)
+
+        y += x
+        print("Y: ",y)
+
+        x[0] = 1
+        print("X :",x)
+        print("Y: ",y)
+
+__main__()

@@ -20,26 +20,40 @@ class Cube:
 class Octree:
     def __init__(self,_level=0):
         self.octants = [None]*8
-        self.level = _level
+
+    def define(self,cube):
+        x,y,z = cube.pos
+        #find quadrant for new cube
+        #will have to loop... i think
+        quad = 0
+
+        if isinstance(self.octants[quad],Cube):
+            temp = self.octants[quad]
+            self.octants[quad] = Octree()
+            self.octants[quad].octants[0] = temp
+            self.octants[quad].octants[1] = cube
         
-    def start(self):
-        self.octants[0] = Cube((0,0,0)); self.octants[1] = Cube((1,0,0))
-        self.octants[2] = Cube((0,0,1)); self.octants[3] = Cube((1,0,1))
-        self.octants[4] = Cube((0,1,0)); self.octants[5] = Cube((1,1,0))
-        self.octants[6] = Cube((0,1,1)); self.octants[7] = Cube((1,1,1))
-        
-    def raise_level(self):
-        x = Octree(self.level+1)
-        x.octants[0] = self
-        return x
 
 class TerrainGenerator:
     def __init__(self):
         self.map = Octree()
-        self.map.start()
+        self.start()
         
         self.cube_list = []
-
-    def test(self):
         self.cube_list += self.map.octants
+
+        c = Cube((1,0,0))
+        self.map.define(c)
+        self.cube_list.append(c)
+        
+
+    def start(self):
+        self.map.octants[0] = Cube((0,0,0));   self.map.octants[1] = Cube((-1,0,0))
+        self.map.octants[2] = Cube((0,0,-1));  self.map.octants[3] = Cube((-1,0,-1))
+        self.map.octants[4] = Cube((0,-1,0));  self.map.octants[5] = Cube((-1,-1,0))
+        self.map.octants[6] = Cube((0,-1,-1)); self.map.octants[7] = Cube((-1,-1,-1))
     
+    def test(self):
+        
+        print(type(self.map.octants[0]))
+        print(type(self.map.octants[0]) == Cube)
