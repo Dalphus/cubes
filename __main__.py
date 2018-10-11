@@ -3,28 +3,34 @@ from Camera import Player
 from Terrain import TerrainGenerator
 from Draw import Render
 from Input import InputManager as im
+from GUI import *
 
 class __main__:
     
     def __init__(self,w,h):
         #pygame shit
+        pygame.init()
         window = pygame.display.set_mode((w,h))
         clock = pygame.time.Clock()
-        pygame.init()
+        font = pygame.font.SysFont('Courier', 20)
 
         #variables +other cool stuff
         im.__init__()
         Render.__init__()
-        paused = False
-        font = pygame.font.SysFont('Courier', 20)
-        p1 = Player((0,1,0))
+        paused = True
+        p1 = Player((-1,1,0))
         terrain = TerrainGenerator()
-        terrain.flat()
+
+        #debug menu
+        debug = Menu()
+        b1 = Button(pygame.Rect(100,100,120,50),terrain.test,"test",font)
+        debug.add_buttons(b1)
         
         #game loop
         while True:
             dt = clock.tick()/200
-
+            if dt == 0: dt = 0.01
+            
             #input shenanigans
             im.manage_input()
             for e in im.keydown():
@@ -40,15 +46,18 @@ class __main__:
                 pygame.mouse.set_pos(256,256)
                 pygame.event.clear(pygame.MOUSEMOTION)
                 p1.update(dt)
-                Render.update(terrain.cube_list,p1)
             else:
-                pass
+                debug.update()
+
+            Render.update(terrain.cube_list,p1)
             window.blit(Render.world_surface,(0,0))
+            if paused:
+                window.blit(debug.menu_surface,(0,0))
 
             #print out fps
             fps = font.render(str(int(clock.get_fps())),True,(0,255,0))
             window.blit(fps,(20,20))
-    
+            
             pygame.display.flip()
 
 __main__(512,512)
