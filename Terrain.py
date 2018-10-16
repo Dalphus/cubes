@@ -27,7 +27,7 @@ class Octree:
         #will have to loop... i think
         quad = 0
 
-        if isinstance(self.octants[quad],Cube):
+        if type(self.octants[quad]) == Cube:
             temp = self.octants[quad]
             self.octants[quad] = Octree()
             self.octants[quad].octants[0] = temp
@@ -42,9 +42,6 @@ class TerrainGenerator:
         self.cube_list = []
         self.cube_list += self.map.octants
 
-        c = Cube((1,0,0))
-        self.map.define(c)
-        self.cube_list.append(c)
         
 
     def start(self):
@@ -54,6 +51,6 @@ class TerrainGenerator:
         self.map.octants[6] = Cube((0,-1,-1)); self.map.octants[7] = Cube((-1,-1,-1))
     
     def test(self):
-        
-        print(type(self.map.octants[0]))
-        print(type(self.map.octants[0]) == Cube)
+        c = Cube((1,0,0))
+        self.map.define(c)
+        self.cube_list.append(c)
