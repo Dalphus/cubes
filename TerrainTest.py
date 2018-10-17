@@ -5,8 +5,9 @@ pygame.init()
 im.__init__()
 
 class Quadtree:
-    def __init__(self):
+    def __init__(self,_level=0):
         self.quadrants = [None]*4
+        self.level = _level
 
     def draw(self):
         pass
@@ -57,10 +58,13 @@ class __main__:
         window = pygame.display.set_mode((500,500))
         font = pygame.font.SysFont('Courier', 20)
         clock = pygame.time.Clock()
+        
         cam = Camera()
-        board = Square((0,0))
-        square_list = [board]
         cursor = Cursor()
+        
+        board = Quadtree()
+        board.quadrants[0] = Square((0,0))
+        square_list = [board.quadrants[0]]
         
         while True:
             im.manage_input()
@@ -70,8 +74,19 @@ class __main__:
             for e in im.keydown():
                 if e.key == pygame.K_RETURN:
                     s = Square((cursor.x,cursor.y))
-                    
+                    x1,y1 = int(math.sqrt(s.x)),int(math.sqrt(s.y))
+                    max_level = x1 if x1 > y1 else y1
+                    x1 = [int(i) for i in bin(s.x)[2:]]
+                    y1 = [int(i) for i in bin(s.y)[2:]]
+                    print(s.x,x1)
+                    print(s.y,y1)
 
+                    temp = board
+                    if board.level < max_level:
+                        board = Quadtree(max_level)
+                        board[0] = temp
+                    else:
+                    
                     
                     square_list.append(s)
             
