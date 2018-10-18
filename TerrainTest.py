@@ -8,16 +8,17 @@ class Quadtree:
     def __init__(self,_level=0):
         self.quadrants = [None]*4
         self.level = _level
+        self.should_draw = [1,1,1,1]
 
-    def draw(self,window,offset,green=255,pos=(0,0)):
+    def draw(self,window,offset,green=255,pos=(0,0),width=1):
         x,y = pos[0]*50-offset[0],pos[1]*50-offset[1]
         scale = (2**(self.level+1))*50
-        pygame.draw.polygon(window,(0,green,0),((x,y),(x+scale,y),(x+scale,y+scale),(x,y+scale)),1)
+        pygame.draw.polygon(window,(0,green,0),((x,y),(x+scale,y),(x+scale,y+scale),(x,y+scale)),width)
 
-        bonus = self.level**2
-        for i in range(0,2):
-            if isinstance(self.quadrants[i],Quadtree):
-                self.quadrants[i].draw(window,offset,green-50,(pos[0]+(i%2)*bonus,pos[1]+((i+1)%2)*bonus))
+        bonus = 2**self.level
+        for i in range(0,4):
+            if self.should_draw[i] and isinstance(self.quadrants[i],Quadtree):
+                self.quadrants[i].draw(window,offset,green-50,(pos[0]+(i%2)*bonus,pos[1]+(i>1)*bonus),width+1)
 
 class Square:
     def __init__(self,pos):
@@ -106,7 +107,7 @@ class __main__:
                     while temp.level > 0:
                         index = x1[ctr] + 2*y1[ctr]
                         if not isinstance(temp.quadrants[index],Quadtree):
-                            temp.quadrants[index] = Quadtree(max_level-ctr)
+                            temp.quadrants[index] = Quadtree(max_level-ctr-1)
                         temp = temp.quadrants[index]
                         ctr += 1
 
@@ -120,12 +121,12 @@ class __main__:
             window.fill((255,255,255))
             pygame.draw.line(window,(255,0,0),(-x,0),(-x,500))
             pygame.draw.line(window,(255,0,0),(0,-y),(500,-y))
+            board.draw(window,(x,y))
             for s in square_list: s.draw(window,(x,y))
             cursor.draw(window,(x,y))
-            board.draw(window,(x,y))
             window = pygame.transform.flip(window,0,1)
 
-            fps = font.render(('%.1f'%cursor.x)+", "+('%.1f'%cursor.y),True,(0,255,0))
+            fps = font.render(str((cursor.x,cursor.y)),True,(0,255,0))
             window.blit(fps,(20,20))
             
             screen.blit(window,(0,0))
