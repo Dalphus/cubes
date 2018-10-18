@@ -9,19 +9,15 @@ class Quadtree:
         self.quadrants = [None]*4
         self.level = _level
 
-    def draw(self,window,offset,pos=(0,0)):
+    def draw(self,window,offset,green=255,pos=(0,0)):
         x,y = pos[0]*50-offset[0],pos[1]*50-offset[1]
-        scale = (2**self.level+1)*50
-        pygame.draw.polygon(window,(0,255,0),((x,y),(x+scale,y),(x+scale,y+scale),(x,y+scale)),1)
+        scale = (2**(self.level+1))*50
+        pygame.draw.polygon(window,(0,green,0),((x,y),(x+scale,y),(x+scale,y+scale),(x,y+scale)),1)
 
-        if isinstance(self.quadrants[0],Quadtree):
-            self.quadrants[0].draw(window,offset,(pos[0],pos[1]))
-        if isinstance(self.quadrants[1],Quadtree):
-            self.quadrants[1].draw(window,offset,(pos[0]+(self.level)**2,pos[1]))
-        if isinstance(self.quadrants[2],Quadtree):
-            self.quadrants[2].draw(window,offset,(pos[0],pos[1]+(self.level)**2))
-        if isinstance(self.quadrants[3],Quadtree):
-            self.quadrants[3].draw(window,offset,(pos[0]+(self.level)**2,pos[1]+(self.level)**2))
+        bonus = self.level**2
+        for i in range(0,2):
+            if isinstance(self.quadrants[i],Quadtree):
+                self.quadrants[i].draw(window,offset,green-50,(pos[0]+(i%2)*bonus,pos[1]+((i+1)%2)*bonus))
 
 class Square:
     def __init__(self,pos):
@@ -49,6 +45,8 @@ class Camera:
         if self.pressed[2]: self.x -= 5
         if self.pressed[3]: self.x += 5
 
+    def test(self): return
+        
 class Cursor:
     def __init__(self):
         self.x = 0; self.y = 0
@@ -93,19 +91,15 @@ class __main__:
 
                     x1 = [int(i) for i in bin(s.x)[2:]]
                     y1 = [int(i) for i in bin(s.y)[2:]]
-                    print(s.x,x1)
-                    print(s.y,y1)
 
                     temp = board
                     if board.level < max_level:
-                        print("extend",max_level)
                         board = Quadtree(max_level)
                         board.quadrants[0] = temp
                     max_level = board.level
 
                     x1 = [0 for i in range(len(x1)-1,max_level)] + x1
                     y1 = [0 for i in range(len(y1)-1,max_level)] + y1
-                    print(x1,y1,'\n')
                     
                     temp = board
                     ctr = 0
@@ -119,6 +113,7 @@ class __main__:
                     index = x1[max_level] + 2*y1[max_level]
                     temp.quadrants[index] = s
                     square_list.append(s)
+                    print(max_level)
             
             x,y = cam.x,cam.y
 
