@@ -9,20 +9,31 @@ class Quadtree:
         self.quadrants = [None]*4
         self.level = _level
 
-    def draw(self):
-        pass
+    def draw(self,window,offset,pos=(0,0)):
+        x,y = pos[0]*50-offset[0],pos[1]*50-offset[1]
+        scale = (2**self.level+1)*50
+        pygame.draw.polygon(window,(0,255,0),((x,y),(x+scale,y),(x+scale,y+scale),(x,y+scale)),1)
+
+        if isinstance(self.quadrants[0],Quadtree):
+            self.quadrants[0].draw(window,offset,(pos[0],pos[1]))
+        if isinstance(self.quadrants[1],Quadtree):
+            self.quadrants[1].draw(window,offset,(pos[0]+(self.level)**2,pos[1]))
+        if isinstance(self.quadrants[2],Quadtree):
+            self.quadrants[2].draw(window,offset,(pos[0],pos[1]+(self.level)**2))
+        if isinstance(self.quadrants[3],Quadtree):
+            self.quadrants[3].draw(window,offset,(pos[0]+(self.level)**2,pos[1]+(self.level)**2))
 
 class Square:
     def __init__(self,pos):
         self.x,self.y = pos
         
     def draw(self,window,offset):
-        x,y = (self.x*50-offset[0],(-1-self.y)*50-offset[1])
+        x,y = self.x*50-offset[0],self.y*50-offset[1]
         pygame.draw.polygon(window,(0,0,255),((x,y),(x+50,y),(x+50,y+50),(x,y+50)),3)
 
 class Camera:
     def __init__(self):
-        self.x = -100; self.y = 400
+        self.x = -100; self.y = -100
         self.keys = [pygame.K_w,pygame.K_s,pygame.K_a,pygame.K_d]
         self.pressed = [False]*4
     
@@ -50,12 +61,13 @@ class Cursor:
             elif e.key == pygame.K_RIGHT: self.x += 1
 
     def draw(self,window,offset):
-        x,y = (self.x*50-offset[0],(-1-self.y)*50-offset[1])
+        x,y = self.x*50-offset[0],self.y*50-offset[1]
         pygame.draw.polygon(window,(0,0,0),((x,y),(x+50,y),(x+50,y+50),(x,y+50)),3)
         
 class __main__:
     def __init__(self):
-        window = pygame.display.set_mode((500,500))
+        screen = pygame.display.set_mode((500,500))
+        window = pygame.Surface((500,500))
         font = pygame.font.SysFont('Courier', 20)
         clock = pygame.time.Clock()
         
@@ -74,8 +86,11 @@ class __main__:
             for e in im.keydown():
                 if e.key == pygame.K_RETURN:
                     s = Square((cursor.x,cursor.y))
-                    x1,y1 = int(math.sqrt(s.x)),int(math.sqrt(s.y))
+                    
+                    x1 = 0 if s.x == 0 else int(math.log2(s.x))
+                    y1 = 0 if s.y == 0 else int(math.log2(s.y))
                     max_level = x1 if x1 > y1 else y1
+
                     x1 = [int(i) for i in bin(s.x)[2:]]
                     y1 = [int(i) for i in bin(s.y)[2:]]
                     print(s.x,x1)
@@ -83,24 +98,42 @@ class __main__:
 
                     temp = board
                     if board.level < max_level:
+                        print("extend",max_level)
                         board = Quadtree(max_level)
-                        board[0] = temp
-                    else:
+                        board.quadrants[0] = temp
+                    max_level = board.level
+
+                    x1 = [0 for i in range(len(x1)-1,max_level)] + x1
+                    y1 = [0 for i in range(len(y1)-1,max_level)] + y1
+                    print(x1,y1,'\n')
                     
-                    
+                    temp = board
+                    ctr = 0
+                    while temp.level > 0:
+                        index = x1[ctr] + 2*y1[ctr]
+                        if not isinstance(temp.quadrants[index],Quadtree):
+                            temp.quadrants[index] = Quadtree(max_level-ctr)
+                        temp = temp.quadrants[index]
+                        ctr += 1
+
+                    index = x1[max_level] + 2*y1[max_level]
+                    temp.quadrants[index] = s
                     square_list.append(s)
             
-            x,y = (cam.x,-cam.y)
-            
+            x,y = cam.x,cam.y
+
             window.fill((255,255,255))
-            for s in square_list: s.draw(window,(x,y))
-            cursor.draw(window,(x,y))
             pygame.draw.line(window,(255,0,0),(-x,0),(-x,500))
             pygame.draw.line(window,(255,0,0),(0,-y),(500,-y))
+            for s in square_list: s.draw(window,(x,y))
+            cursor.draw(window,(x,y))
+            board.draw(window,(x,y))
+            window = pygame.transform.flip(window,0,1)
 
             fps = font.render(('%.1f'%cursor.x)+", "+('%.1f'%cursor.y),True,(0,255,0))
             window.blit(fps,(20,20))
             
+            screen.blit(window,(0,0))
             pygame.display.flip()
             clock.tick(30)
 
