@@ -3,6 +3,7 @@ from Input import InputManager as im
 import math
 pygame.init()
 im.__init__()
+zoom = 10
 
 class Quadtree:
     def __init__(self,_level=0):
@@ -10,23 +11,24 @@ class Quadtree:
         self.level = _level
         self.should_draw = [1,1,1,1]
 
-    def draw(self,window,offset,green=255,pos=(0,0),width=1):
-        x,y = pos[0]*50-offset[0],pos[1]*50-offset[1]
-        scale = (2**(self.level+1))*50
-        pygame.draw.polygon(window,(0,green,0),((x,y),(x+scale,y),(x+scale,y+scale),(x,y+scale)),width)
+    def draw(self,window,offset,pos=(0,0),width=1):
+        x,y = pos[0]*zoom-offset[0],pos[1]*zoom-offset[1]
+        scale = (2**(self.level+1))*zoom
+        pygame.draw.polygon(window,(0,255,0),((x,y),(x+scale,y),(x+scale,y+scale),(x,y+scale)),width)
 
         bonus = 2**self.level
         for i in range(0,4):
             if self.should_draw[i] and isinstance(self.quadrants[i],Quadtree):
-                self.quadrants[i].draw(window,offset,green-50,(pos[0]+(i%2)*bonus,pos[1]+(i>1)*bonus),width+1)
+                self.quadrants[i].draw(window,offset,(pos[0]+(i%2)*bonus,pos[1]+(i>1)*bonus),width+1)
+        pass
 
 class Square:
     def __init__(self,pos):
         self.x,self.y = pos
         
     def draw(self,window,offset):
-        x,y = self.x*50-offset[0],self.y*50-offset[1]
-        pygame.draw.polygon(window,(0,0,255),((x,y),(x+50,y),(x+50,y+50),(x,y+50)),3)
+        x,y = self.x*zoom-offset[0],self.y*zoom-offset[1]
+        pygame.draw.polygon(window,(0,0,255),((x,y),(x+zoom,y),(x+zoom,y+zoom),(x,y+zoom)),3)
 
 class Camera:
     def __init__(self):
@@ -41,12 +43,11 @@ class Camera:
         for e in im.keyup():
             for i in range(0,4):
                 if e.key == self.keys[i]: self.pressed[i] = False
-        if self.pressed[0]: self.y += 5
-        if self.pressed[1]: self.y -= 5
-        if self.pressed[2]: self.x -= 5
-        if self.pressed[3]: self.x += 5
-
-    def test(self): return
+        if self.pressed[0]: self.y += 15
+        if self.pressed[1]: self.y -= 15
+        if self.pressed[2]: self.x -= 15
+        if self.pressed[3]: self.x += 15
+        pass
         
 class Cursor:
     def __init__(self):
@@ -60,13 +61,13 @@ class Cursor:
             elif e.key == pygame.K_RIGHT: self.x += 1
 
     def draw(self,window,offset):
-        x,y = self.x*50-offset[0],self.y*50-offset[1]
-        pygame.draw.polygon(window,(0,0,0),((x,y),(x+50,y),(x+50,y+50),(x,y+50)),3)
+        x,y = self.x*zoom-offset[0],self.y*zoom-offset[1]
+        pygame.draw.polygon(window,(0,0,0),((x,y),(x+zoom,y),(x+zoom,y+zoom),(x,y+zoom)),3)
         
 class __main__:
     def __init__(self):
-        screen = pygame.display.set_mode((500,500))
-        window = pygame.Surface((500,500))
+        screen = pygame.display.set_mode((600,600))
+        window = pygame.Surface((600,600))
         font = pygame.font.SysFont('Courier', 20)
         clock = pygame.time.Clock()
         
@@ -119,8 +120,8 @@ class __main__:
             x,y = cam.x,cam.y
 
             window.fill((255,255,255))
-            pygame.draw.line(window,(255,0,0),(-x,0),(-x,500))
-            pygame.draw.line(window,(255,0,0),(0,-y),(500,-y))
+            pygame.draw.line(window,(255,0,0),(-x,0),(-x,600))
+            pygame.draw.line(window,(255,0,0),(0,-y),(600,-y))
             board.draw(window,(x,y))
             for s in square_list: s.draw(window,(x,y))
             cursor.draw(window,(x,y))

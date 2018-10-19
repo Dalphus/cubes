@@ -25,47 +25,42 @@ class Octree:
         self.pos = pos
         self.level = _level
 
-    def define(self,cube):
-        x,y,z = cube.pos
-        x1,y1,z1 = (0,0,0)
-        x2,y2,z2 = (0,0,0)
-        
-        if self.level = 0:
-            x1,y1,z1 = self.pos
-            x2,y2,z2 = (2**x1-1+x,2**y1-1+y,2**z1-1+z)
-
-            if x2<x<x2-1 or y2<y<y2-1 or z2<z<z2-1:
-                sup = Octree(None,self.level+1)
-                sup.octants[0] = self
-                sup.octants[1] = Octree((1,0,0))
-                sup.octants[1].octants[0] = cube
-                return sup
-        else:
-            pass
-
-        if type(self.octants[quad]) == Cube:
-            temp = self.octants[quad]
-            self.octants[quad] = Octree()
-            self.octants[quad].octants[0] = temp
-            self.octants[quad].octants[1] = cube
-        
-
 class TerrainGenerator:
     def __init__(self):
-        self.map = Octree((0,0,0))
-        self.start()
-        
-        self.cube_list = []
-        self.cube_list.append(self.map.octants[0])
-        self.cube_list.append(self.map.octants[1])
-        
-    def start(self):
-        self.map.octants[0] = Cube((0,0,0)); self.map.octants[1] = Cube((1,0,0))
-        self.map.octants[2] = Cube((0,0,1)); self.map.octants[3] = Cube((1,0,1))
-        self.map.octants[4] = Cube((0,1,0)); self.map.octants[5] = Cube((1,1,0))
-        self.map.octants[6] = Cube((0,1,1)); self.map.octants[7] = Cube((1,1,1))
+        self.map = Octree()
+        self.map.octants[0] = Cube((0,0,0))
+        self.cube_list = [self.map.octants[0]]
 
     def test(self):
-        c = Cube((2,0,0))
-        self.map.define(c)
-        #self.cube_list.append(c)
+        c = Cube((1,0,0))
+        self.define(c)
+
+    def define(self,cube):
+        level = []
+        max_level = self.map.level
+        for i in range(0,3):
+            if cube.pos[i] != 0:
+                max_level = max(max_level,int(math.log2(cube.pos[0])))
+            
+            level[i] = [int(i) for i in bin(cube.pos[i])[2:]]
+
+        temp = self.map
+        if self.map.level < max_level:
+            self.map = Octree(max_level)
+            self.map.octants[0] = temp
+        
+        for i in range(0,3):
+            level[i] = [0 for i in range(len(level[i])-1,max_level)] + level[i]
+
+        temp = self.map
+        ctr = 0
+        while temp.level > 0:
+            index = level[0][ctr] + 2*level[1][ctr] + 4*level[2][ctr]
+            if not isinstance(temp.octants[index],Octree):
+                temp.octants[index] = Octree(max_level-ctr-1)
+            temp = temp.quadrants[index]
+            ctr += 1
+
+        index = x1[max_level] + 2*y1[max_level]
+        temp.quadrants[index] = s
+        square_list.append(s)
