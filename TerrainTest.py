@@ -3,13 +3,12 @@ from Input import InputManager as im
 import math
 pygame.init()
 im.__init__()
-zoom = 10
+zoom = 40
 
 class Quadtree:
     def __init__(self,_level=0):
         self.quadrants = [None]*4
         self.level = _level
-        self.should_draw = [1,1,1,1]
 
     def draw(self,window,offset,pos=(0,0),width=1):
         x,y = pos[0]*zoom-offset[0],pos[1]*zoom-offset[1]
@@ -18,7 +17,7 @@ class Quadtree:
 
         bonus = 2**self.level
         for i in range(0,4):
-            if self.should_draw[i] and isinstance(self.quadrants[i],Quadtree):
+            if isinstance(self.quadrants[i],Quadtree):
                 self.quadrants[i].draw(window,offset,(pos[0]+(i%2)*bonus,pos[1]+(i>1)*bonus),width+1)
         pass
 
@@ -65,6 +64,37 @@ class Cursor:
         pygame.draw.polygon(window,(0,0,0),((x,y),(x+zoom,y),(x+zoom,y+zoom),(x,y+zoom)),3)
         
 class __main__:
+    def define(self,s,board):           
+        x1 = 0 if s.x == 0 else int(math.log2(s.x))
+        y1 = 0 if s.y == 0 else int(math.log2(s.y))
+        max_level = x1 if x1 > y1 else y1
+
+        x1 = [int(i) for i in bin(s.x)[2:]]
+        y1 = [int(i) for i in bin(s.y)[2:]]
+
+        temp = board
+        if board.level < max_level:
+            board = Quadtree(max_level)
+            board.quadrants[0] = temp
+        max_level = board.level
+
+        x1 = [0 for i in range(len(x1)-1,max_level)] + x1
+        y1 = [0 for i in range(len(y1)-1,max_level)] + y1
+                    
+        temp = board
+        ctr = 0
+        while temp.level > 0:
+            index = x1[ctr] + 2*y1[ctr]
+            if not isinstance(temp.quadrants[index],Quadtree):
+                temp.quadrants[index] = Quadtree(max_level-ctr-1)
+            temp = temp.quadrants[index]
+            ctr += 1
+
+        index = x1[max_level] + 2*y1[max_level]
+        temp.quadrants[index] = s
+        square_list.append(s)
+        print(max_level)
+
     def __init__(self):
         screen = pygame.display.set_mode((600,600))
         window = pygame.Surface((600,600))
@@ -86,36 +116,7 @@ class __main__:
             for e in im.keydown():
                 if e.key == pygame.K_RETURN:
                     s = Square((cursor.x,cursor.y))
-                    
-                    x1 = 0 if s.x == 0 else int(math.log2(s.x))
-                    y1 = 0 if s.y == 0 else int(math.log2(s.y))
-                    max_level = x1 if x1 > y1 else y1
-
-                    x1 = [int(i) for i in bin(s.x)[2:]]
-                    y1 = [int(i) for i in bin(s.y)[2:]]
-
-                    temp = board
-                    if board.level < max_level:
-                        board = Quadtree(max_level)
-                        board.quadrants[0] = temp
-                    max_level = board.level
-
-                    x1 = [0 for i in range(len(x1)-1,max_level)] + x1
-                    y1 = [0 for i in range(len(y1)-1,max_level)] + y1
-                    
-                    temp = board
-                    ctr = 0
-                    while temp.level > 0:
-                        index = x1[ctr] + 2*y1[ctr]
-                        if not isinstance(temp.quadrants[index],Quadtree):
-                            temp.quadrants[index] = Quadtree(max_level-ctr-1)
-                        temp = temp.quadrants[index]
-                        ctr += 1
-
-                    index = x1[max_level] + 2*y1[max_level]
-                    temp.quadrants[index] = s
-                    square_list.append(s)
-                    print(max_level)
+                    self.define(s,board)
             
             x,y = cam.x,cam.y
 
