@@ -3,7 +3,7 @@ from Input import InputManager as im
 import math
 pygame.init()
 im.__init__()
-zoom = 40
+zoom = 10
 
 class Quadtree:
     def __init__(self,_level=0):
@@ -64,68 +64,76 @@ class Cursor:
         pygame.draw.polygon(window,(0,0,0),((x,y),(x+zoom,y),(x+zoom,y+zoom),(x,y+zoom)),3)
         
 class __main__:
-    def define(self,s,board):           
+    def define(self,s):
         x1 = 0 if s.x == 0 else int(math.log2(s.x))
         y1 = 0 if s.y == 0 else int(math.log2(s.y))
-        max_level = x1 if x1 > y1 else y1
+        max_level = max(x1,y1)
 
         x1 = [int(i) for i in bin(s.x)[2:]]
         y1 = [int(i) for i in bin(s.y)[2:]]
 
-        temp = board
-        if board.level < max_level:
-            board = Quadtree(max_level)
-            board.quadrants[0] = temp
-        max_level = board.level
+        temp = self.board
+        if self.board.level < max_level:
+            self.board = Quadtree(max_level)
+            self.board.quadrants[0] = temp
+        max_level = self.board.level
 
         x1 = [0 for i in range(len(x1)-1,max_level)] + x1
         y1 = [0 for i in range(len(y1)-1,max_level)] + y1
                     
-        temp = board
+        temp = self.board
         ctr = 0
         while temp.level > 0:
             index = x1[ctr] + 2*y1[ctr]
-            if not isinstance(temp.quadrants[index],Quadtree):
+            if not isinstance(temp.quadrants[index],Quadtree) or temp.quadrants[index].level != max_level-ctr-1:
+                temp2 = temp.quadrants[index]
                 temp.quadrants[index] = Quadtree(max_level-ctr-1)
+                temp.quadrants[index].quadrants[0] = temp2
             temp = temp.quadrants[index]
             ctr += 1
 
         index = x1[max_level] + 2*y1[max_level]
         temp.quadrants[index] = s
-        square_list.append(s)
+        self.square_list.append(s)
         print(max_level)
 
     def __init__(self):
+        #pygame variables
         screen = pygame.display.set_mode((600,600))
         window = pygame.Surface((600,600))
         font = pygame.font.SysFont('Courier', 20)
         clock = pygame.time.Clock()
         
+        #UI variables
         cam = Camera()
         cursor = Cursor()
         
-        board = Quadtree()
-        board.quadrants[0] = Square((0,0))
-        square_list = [board.quadrants[0]]
+        #Data structure variables
+        self.board = Quadtree()
+        self.board.quadrants[0] = Square((0,0))
+        self.square_list = [self.board.quadrants[0]]
         
         while True:
+            #updating input
             im.manage_input()
             cam.update()
             cursor.update()
 
+            #special case input
             for e in im.keydown():
                 if e.key == pygame.K_RETURN:
                     s = Square((cursor.x,cursor.y))
-                    self.define(s,board)
-            
-            x,y = cam.x,cam.y
+                    self.define(s)
 
+            x,y = cam.x,cam.y
+            #graphics
             window.fill((255,255,255))
             pygame.draw.line(window,(255,0,0),(-x,0),(-x,600))
             pygame.draw.line(window,(255,0,0),(0,-y),(600,-y))
-            board.draw(window,(x,y))
-            for s in square_list: s.draw(window,(x,y))
+            self.board.draw(window,(x,y))
+            for s in self.square_list: s.draw(window,(x,y))
             cursor.draw(window,(x,y))
+            #flip dispaly, because 0y is the top of the screen
             window = pygame.transform.flip(window,0,1)
 
             fps = font.render(str((cursor.x,cursor.y)),True,(0,255,0))
