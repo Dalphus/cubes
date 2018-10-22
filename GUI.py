@@ -10,7 +10,7 @@ class Button:
         self.hover = False
         
         self.text = _text
-        self.label = font.render(_text,True,(0,0,0))
+        self.label = font.render(_text,True,(255,100,0))
         self.text_pos = (self.rect.x+(self.rect.width-self.label.get_width())//2,\
                          self.rect.y+(self.rect.height-self.label.get_height())//2)
     
@@ -32,12 +32,9 @@ class Menu:
         self.menu_surface = pygame.Surface(size)
         self.menu_surface.set_colorkey((255,255,255))
         
-    def add_buttons(self,button):
-        if isinstance(button,list):
-            for b in button:
-                self.button_list.append(b)
-        else:
-            self.button_list.append(button)
+    def add_buttons(self,*buttons):
+        for b in buttons:
+            self.button_list.append(b)
 
     def update(self):
         self.menu_surface.fill((255,255,255))

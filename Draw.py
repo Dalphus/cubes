@@ -1,9 +1,11 @@
 import pygame, math
+import numpy as np
+from Terrain import Octree
 
 #swanky arrays
 verticies = [(0,0,0),(0,1,0),(1,0,0),(1,1,0),\
              (0,0,1),(0,1,1),(1,0,1),(1,1,1)]
-lines = [(0,1),(0,2),(1,3),(2,3),\
+edges = [(0,1),(0,2),(1,3),(2,3),\
          (4,5),(4,6),(5,7),(6,7),\
          (0,4),(1,5),(2,6),(3,7)]
 #north,east,south,west,up,down
@@ -28,16 +30,25 @@ class Render:
         x = math.hypot(pos1[0]-pos2[0],pos1[2]-pos2[2])
         return math.hypot(x,pos1[1]-pos2[1])**2
 
+    def numpy_test():
+        x = np.array([1,5,2])
+        y = np.array([7,4,1])
+        print(x + y)
+        print(x*y)
+        print(x-y)
+        print(x/y)
+        print(x%y)
+
     @classmethod
-    def update(cls,cubes,player):
-        draw_queue = []
+    def cubes(cls,cubes,player):
+        cls.cube_queue = []
         for cube in cubes:
-            for face in range(0,len(faces)):
+            for face in faces:
                 if not cube.covered[face] or not cube.visible[face]: continue
                 total_dist = 0
                 points = []
                 can_draw = 0
-                for vertex in faces[face]:
+                for vertex in face:
                     x,y,z = cube.pos
                     x1,y1,z1 = verticies[vertex]
                     x+=x1;y+=y1;z+=z1
@@ -69,8 +80,22 @@ class Render:
                         points.append((int(x),int(y)))
                         
                 if can_draw > 0:
-                    draw_queue.append((total_dist,points,colors[face]))
+                    cls.cube_queue.append((total_dist,points,colors[face]))
 
+    @classmethod
+    def octree(cls,ot,player):
+        cls.line_queue = []
+
+        x,y = pos[0],pos[1]
+        scale = (2**(ot.level+1))
+
+        bonus = 2**ot.level
+        for i in range(0,8):
+            if isinstance(ot.quadrants[i],Octree):
+                Render.draw(ot.octants[i],player)
+
+
+    def render(cls):
         #draws polygons
         draw_queue.sort(reverse=True)
         cls.world_surface.fill((255,255,255))

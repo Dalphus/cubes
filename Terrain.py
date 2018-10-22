@@ -39,7 +39,7 @@ class TerrainGenerator:
         level = [0,0,0]
         max_level = self.map.level
         for i in range(0,3):
-            if cube.pos[i] != 0:
+            if cube.pos[i] >= 1:
                 max_level = max(max_level,int(math.log2(cube.pos[0])))
             #create binary code for each coordinate
             level[i] = [int(i) for i in bin(cube.pos[i])[2:]]
@@ -70,6 +70,9 @@ class TerrainGenerator:
 
         #adding the cube
         index = level[0][ctr] + 2*level[1][ctr] + 4*level[2][ctr]
-        temp.octants[index] = cube
-        self.cube_list.append(cube)
+        if not isinstance(temp.octants[index],Cube):
+            temp.octants[index] = cube
+            self.cube_list.append(cube)
+        else:
+            print("error")
         print(max_level)

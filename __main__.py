@@ -24,7 +24,8 @@ class __main__:
         #debug menu
         debug = Menu()
         b1 = Button(pygame.Rect(100,100,120,50),terrain.test,"test",font)
-        debug.add_buttons(b1)
+        b2 = Button(pygame.Rect(100,200,120,50),Render.numpy_test,"numpy test",font)
+        debug.add_buttons(b1,b2)
         
         #game loop
         while True:
@@ -59,6 +60,7 @@ class __main__:
             window.blit(fps,(20,20))
             
             pygame.display.flip()
+
 
 __main__(512,512)
 
