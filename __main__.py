@@ -16,16 +16,15 @@ class __main__:
 
         #variables +other cool stuff
         im.__init__()
-        Render.__init__()
         paused = False
         p1 = Player((-1,1,0))
         terrain = TerrainGenerator()
+        render = Render()
 
         #debug menu
         debug = Menu()
-        b1 = Button(pygame.Rect(100,100,120,50),terrain.test,"test",font)
-        b2 = Button(pygame.Rect(100,200,120,50),Render.numpy_test,"numpy test",font)
-        debug.add_buttons(b1,b2)
+        b1 = Button(pygame.Rect(100,100,120,50),render.test,"test",font)
+        debug.add_buttons(b1)
         
         #game loop
         while True:
@@ -50,7 +49,8 @@ class __main__:
             else:
                 debug.update()
 
-            Render.update(terrain.cube_list,p1)
+            render.cubes(terrain.cube_list,p1)
+            render.draw()
             window.blit(Render.world_surface,(0,0))
             if paused:
                 window.blit(debug.menu_surface,(0,0))

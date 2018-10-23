@@ -20,6 +20,8 @@ class Render:
         cls.world_surface = pygame.Surface(size)
         cls.w = size[0]//2
         cls.h = size[1]//2
+
+        cls.p = 0
     
     def rotate2D(pos,rad):
         x,y = pos
@@ -28,59 +30,64 @@ class Render:
 
     def distance3D(pos1,pos2):
         x = math.hypot(pos1[0]-pos2[0],pos1[2]-pos2[2])
-        return math.hypot(x,pos1[1]-pos2[1])**2
+        return math.hypot(x,pos1[1]-pos2[1])
 
-    def numpy_test():
-        x = np.array([1,5,2])
-        y = np.array([7,4,1])
-        print(x + y)
-        print(x*y)
-        print(x-y)
-        print(x/y)
-        print(x%y)
+    @classmethod
+    def translate_point(cls,point,player):
+        x,y,z = point
+        #player position displacment
+        x -= player.x
+        y -= player.y
+        z -= player.z
+        y*= -1
+
+        #camera rotation
+        x,z = Render.rotate2D((x,z),player.yaw)
+        z,y = Render.rotate2D((z,y),player.pitch)
+
+        #depth compensation
+        if z > .01:
+            f = 200/z
+            x *= f
+            y *= f
+            return (cls.w+int(x),cls.h+int(y),1)
+        else:
+            if x < 0: x = 0
+            elif x > 0: x = 2*cls.w
+            if y < 0: y = 0
+            elif y > 0: y = 2*cls.h
+            return (int(x),int(y),0)
+
+    @classmethod
+    def test(cls):
+        cls.p = 1
 
     @classmethod
     def cubes(cls,cubes,player):
         cls.cube_queue = []
         for cube in cubes:
-            for face in faces:
+            for face in range(0,6):
                 if not cube.covered[face] or not cube.visible[face]: continue
                 total_dist = 0
                 points = []
                 can_draw = 0
-                for vertex in face:
+
+                for vertex in faces[face]:
                     x,y,z = cube.pos
                     x1,y1,z1 = verticies[vertex]
                     x+=x1;y+=y1;z+=z1
+
+                    if cls.p:
+                        print(x,y,z)
                     
-                    total_dist += Render.distance3D((x,y,z),player.pos())
-                    
-                    #player position displacment
-                    x -= player.x
-                    y -= player.y
-                    z -= player.z
-                    y*= -1
-                    
-                    #camera rotation
-                    x,z = Render.rotate2D((x,z),player.yaw)
-                    z,y = Render.rotate2D((z,y),player.pitch)
-                    
-                    #depth compensation
-                    if z > .01:
-                        f = 200/z
-                        x *= f
-                        y *= f
-                        points.append((cls.w+int(x),cls.h+int(y)))
-                        can_draw += 1
-                    else:
-                        if x < 0: x = 0
-                        elif x > 0: x = 2*cls.w
-                        if y < 0: y = 0
-                        elif y > 0: y = 2*cls.h
-                        points.append((int(x),int(y)))
+                    total_dist += Render.distance3D((x,y,z),player.pos())**2
+                    x,y,z = cls.translate_point((x,y,z),player)
+                    points.append((x,y))
+                    can_draw += z
                         
-                if can_draw > 0:
+                if can_draw == 4:
                     cls.cube_queue.append((total_dist,points,colors[face]))
+            cls.p = 0
 
     @classmethod
     def octree(cls,ot,player):
@@ -94,12 +101,12 @@ class Render:
             if isinstance(ot.quadrants[i],Octree):
                 Render.draw(ot.octants[i],player)
 
-
-    def render(cls):
+    @classmethod
+    def draw(cls):
         #draws polygons
-        draw_queue.sort(reverse=True)
+        cls.cube_queue.sort(reverse=True)
         cls.world_surface.fill((255,255,255))
-        for i in range(0,len(draw_queue)):
-            a,b,c = draw_queue[i]
+        for i in range(0,len(cls.cube_queue)):
+            a,b,c = cls.cube_queue[i]
             pygame.draw.polygon(cls.world_surface,c,b)
 
