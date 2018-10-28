@@ -21,7 +21,7 @@ class Render:
         cls.w = size[0]//2
         cls.h = size[1]//2
 
-        cls.p = 0
+        cls.line_queue = []
     
     def rotate2D(pos,rad):
         x,y = pos
@@ -59,10 +59,6 @@ class Render:
             return (int(x),int(y),0)
 
     @classmethod
-    def test(cls):
-        cls.p = 1
-
-    @classmethod
     def cubes(cls,cubes,player):
         cls.cube_queue = []
         for cube in cubes:
@@ -76,37 +72,53 @@ class Render:
                     x,y,z = cube.pos
                     x1,y1,z1 = verticies[vertex]
                     x+=x1;y+=y1;z+=z1
-
-                    if cls.p:
-                        print(x,y,z)
                     
                     total_dist += Render.distance3D((x,y,z),player.pos())**2
                     x,y,z = cls.translate_point((x,y,z),player)
                     points.append((x,y))
                     can_draw += z
                         
-                if can_draw == 4:
+                if can_draw != 0:
                     cls.cube_queue.append((total_dist,points,colors[face]))
-            cls.p = 0
+    pass
 
     @classmethod
-    def octree(cls,ot,player):
-        cls.line_queue = []
-
-        x,y = pos[0],pos[1]
+    def octree(cls,ot,player,pos=(0,0,0)):
         scale = (2**(ot.level+1))
 
+        for edge in edges:
+            points = []
+            can_draw = 0
+
+            for vertex in edge:
+                x,y,z = pos
+                x1,y1,z1 = verticies[vertex]
+                x+=x1*scale;y+=y1*scale;z+=z1*scale
+
+                x,y,z = cls.translate_point((x,y,z),player)
+                points.append((x,y))
+                can_draw += z
+
+            if can_draw != 0:
+                cls.line_queue.append((points,(0,255,75)))
+        
         bonus = 2**ot.level
         for i in range(0,8):
-            if isinstance(ot.quadrants[i],Octree):
-                Render.draw(ot.octants[i],player)
-
+            pos = (pos[0]+(i%2)*bonus,pos[1]+(i%4>1)*bonus,pos[2]+int(i/4)*bonus)
+            if isinstance(ot.octants[i],Octree):
+                cls.octree(ot.octants[i],player,pos)
+        
     @classmethod
     def draw(cls):
         #draws polygons
         cls.cube_queue.sort(reverse=True)
         cls.world_surface.fill((255,255,255))
+        
         for i in range(0,len(cls.cube_queue)):
             a,b,c = cls.cube_queue[i]
             pygame.draw.polygon(cls.world_surface,c,b)
 
+        for i in range(0,len(cls.line_queue)):
+            b,c = cls.line_queue[i]
+            pygame.draw.line(cls.world_surface,c,b[0],b[1],5)
+        cls.line_queue = []

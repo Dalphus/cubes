@@ -31,7 +31,7 @@ class TerrainGenerator:
         self.cube_list = [self.map.octants[0]]
 
     def test(self):
-        c = Cube((1,0,0))
+        c = Cube((2,0,0))
         self.define(c)
 
     def define(self,cube):

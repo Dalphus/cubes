@@ -23,7 +23,7 @@ class __main__:
 
         #debug menu
         debug = Menu()
-        b1 = Button(pygame.Rect(100,100,120,50),render.test,"test",font)
+        b1 = Button(pygame.Rect(100,100,120,50),terrain.test,"test",font)
         debug.add_buttons(b1)
         
         #game loop
@@ -46,11 +46,13 @@ class __main__:
                 pygame.mouse.set_pos(256,256)
                 pygame.event.clear(pygame.MOUSEMOTION)
                 p1.update(dt)
+
+                render.cubes(terrain.cube_list,p1)
+                render.octree(terrain.map,p1)
+                render.draw()
             else:
                 debug.update()
 
-            render.cubes(terrain.cube_list,p1)
-            render.draw()
             window.blit(Render.world_surface,(0,0))
             if paused:
                 window.blit(debug.menu_surface,(0,0))
@@ -63,4 +65,3 @@ class __main__:
 
 
 __main__(512,512)
-
