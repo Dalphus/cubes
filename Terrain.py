@@ -1,4 +1,5 @@
 import math
+from Cursor import Cursor
 
 class Cube:
     #TODO: texture
@@ -31,8 +32,18 @@ class TerrainGenerator:
         self.cube_list = [self.map.octants[0]]
 
     def test(self):
-        c = Cube((2,0,0))
+        c = Cube(Cursor.pos())
         self.define(c)
+
+    def test2(self):
+        bonus = self.map.octants[1].octants[2].level
+        bonus = 2**bonus
+        i = 2
+        print((i%2)*bonus,(i%4>1)*bonus,int(i/4)*bonus)
+
+    
+    def clear(self):
+        self.__init__()
 
     def define(self,cube):
         #variable setup
@@ -40,7 +51,7 @@ class TerrainGenerator:
         max_level = self.map.level
         for i in range(0,3):
             if cube.pos[i] >= 1:
-                max_level = max(max_level,int(math.log2(cube.pos[0])))
+                max_level = max(max_level,int(math.log2(cube.pos[i])))
             #create binary code for each coordinate
             level[i] = [int(i) for i in bin(cube.pos[i])[2:]]
 

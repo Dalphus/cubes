@@ -4,6 +4,7 @@ from Terrain import TerrainGenerator
 from Draw import Render
 from Input import InputManager as im
 from GUI import *
+from Cursor import Cursor
 
 class __main__:
     
@@ -20,11 +21,14 @@ class __main__:
         p1 = Player((-1,1,0))
         terrain = TerrainGenerator()
         render = Render()
+        cursor = Cursor((4,2,0))
 
         #debug menu
         debug = Menu()
         b1 = Button(pygame.Rect(100,100,120,50),terrain.test,"test",font)
-        debug.add_buttons(b1)
+        b2 = Button(pygame.Rect(230,100,120,50),terrain.test2,"test2",font)
+        b3 = Button(pygame.Rect(100,160,120,50),terrain.clear,"clear",font)
+        debug.add_buttons(b1,b2,b3)
         
         #game loop
         while True:
@@ -39,7 +43,6 @@ class __main__:
                     pygame.event.set_grab(not paused)
                     #pygame.mouse.set_visible(paused)
                     print("Paused:",paused)
-                    #im.keydown().remove(e)
             
             #temporary gibberish
             if not paused:
@@ -50,6 +53,9 @@ class __main__:
                 render.cubes(terrain.cube_list,p1)
                 render.octree(terrain.map,p1)
                 render.draw()
+
+                cursor.update()
+                render.cursor(cursor,p1)
             else:
                 debug.update()
 

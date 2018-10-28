@@ -22,6 +22,7 @@ class Render:
         cls.h = size[1]//2
 
         cls.line_queue = []
+        cls.cursor_queue = []
     
     def rotate2D(pos,rad):
         x,y = pos
@@ -85,7 +86,6 @@ class Render:
     @classmethod
     def octree(cls,ot,player,pos=(0,0,0)):
         scale = (2**(ot.level+1))
-
         for edge in edges:
             points = []
             can_draw = 0
@@ -102,12 +102,33 @@ class Render:
             if can_draw != 0:
                 cls.line_queue.append((points,(0,255,75)))
         
-        bonus = 2**ot.level
+        bonus = 2**(ot.level)
+        oldpos = pos
         for i in range(0,8):
             pos = (pos[0]+(i%2)*bonus,pos[1]+(i%4>1)*bonus,pos[2]+int(i/4)*bonus)
             if isinstance(ot.octants[i],Octree):
                 cls.octree(ot.octants[i],player,pos)
-        
+            pos = oldpos
+    pass
+    
+    @classmethod
+    def cursor(cls,cursor,player):
+        for edge in edges:
+            points = []
+            can_draw = 0
+
+            for vertex in edge:
+                x,y,z = cursor.pos()
+                x1,y1,z1 = verticies[vertex]
+                x+=x1;y+=y1;z+=z1
+
+                x,y,z = cls.translate_point((x,y,z),player)
+                points.append((x,y))
+                can_draw += z
+
+            if can_draw != 0:
+                cls.cursor_queue.append((points,(0,0,0)))
+    
     @classmethod
     def draw(cls):
         #draws polygons
@@ -122,3 +143,8 @@ class Render:
             b,c = cls.line_queue[i]
             pygame.draw.line(cls.world_surface,c,b[0],b[1],5)
         cls.line_queue = []
+
+        for i in range(0,len(cls.cursor_queue)):
+            b,c = cls.cursor_queue[i]
+            pygame.draw.line(cls.world_surface,c,b[0],b[1],1)
+        cls.cursor_queue = []
