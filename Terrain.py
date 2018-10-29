@@ -34,13 +34,6 @@ class TerrainGenerator:
     def test(self):
         c = Cube(Cursor.pos())
         self.define(c)
-
-    def test2(self):
-        bonus = self.map.octants[1].octants[2].level
-        bonus = 2**bonus
-        i = 2
-        print((i%2)*bonus,(i%4>1)*bonus,int(i/4)*bonus)
-
     
     def clear(self):
         self.__init__()

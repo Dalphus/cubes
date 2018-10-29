@@ -103,12 +103,9 @@ class Render:
                 cls.line_queue.append((points,(0,255,75)))
         
         bonus = 2**(ot.level)
-        oldpos = pos
         for i in range(0,8):
-            pos = (pos[0]+(i%2)*bonus,pos[1]+(i%4>1)*bonus,pos[2]+int(i/4)*bonus)
             if isinstance(ot.octants[i],Octree):
-                cls.octree(ot.octants[i],player,pos)
-            pos = oldpos
+                cls.octree(ot.octants[i],player,(pos[0]+(i%2)*bonus,pos[1]+(i%4>1)*bonus,pos[2]+int(i/4)*bonus))
     pass
     
     @classmethod

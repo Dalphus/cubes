@@ -26,9 +26,8 @@ class __main__:
         #debug menu
         debug = Menu()
         b1 = Button(pygame.Rect(100,100,120,50),terrain.test,"test",font)
-        b2 = Button(pygame.Rect(230,100,120,50),terrain.test2,"test2",font)
         b3 = Button(pygame.Rect(100,160,120,50),terrain.clear,"clear",font)
-        debug.add_buttons(b1,b2,b3)
+        debug.add_buttons(b1,b3)
         
         #game loop
         while True:
