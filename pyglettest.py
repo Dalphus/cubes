@@ -2,34 +2,26 @@ import pyglet
 from pyglet.window import key
 from pyglet.window import mouse
 
-window = pyglet.window.Window()
+class HelloWorldWindow(pyglet.window.Window):
+    def __init__(self):
+        super(HelloWorldWindow,self).__init__()
 
-label = pyglet.text.Label("Hello World",
-                          font_name="Courier New",
-                          font_size=36,
-                          x=window.width//2, y=window.height//2,
-                          anchor_x="center", anchor_y="center")
-image = pyglet.resource.image("cube.png")
+        self.label = pyglet.text.Label("Hello World",
+                                       font_name="Courier New",
+                                       font_size=36,
+                                       x=self.width//2, y=self.height//2,
+                                       anchor_x="center", anchor_y="center")
+    
+    def on_draw(self):
+        self.clear()
+        self.label.draw()
 
-@window.event
-def on_key_press(symbol,modifiers):
-    if symbol == key.A:
-        print('The "A" key was presses.')
-    elif symbol == key.LEFT:
-        print('The left arrow key was pressed.')
-    elif symbol == key.ENTER:
-        print('The enter key was pressed.')
+    def on_mouse_press(self,x,y,button,modifiers):
+        if button == mouse.LEFT:
+            self.maximize()
 
-@window.event
-def on_mouse_press(x,y,button,modifiers):
-    pass
-
-@window.event
-def on_draw():
-    window.clear()
-    #image.blit(0,0)
-    label.draw()
-
+#window.push_handlers(pyglet.window.event.WindowEventLogger()
+window = HelloWorldWindow()
 pyglet.app.run()
 
 print("Hello World")
