@@ -42,6 +42,8 @@ class __main__:
                     pygame.event.set_grab(not paused)
                     #pygame.mouse.set_visible(paused)
                     print("Paused:",paused)
+                elif e.key == pygame.K_RETURN:
+                    terrain.test()
             
             #temporary gibberish
             if not paused:
