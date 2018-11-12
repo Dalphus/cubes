@@ -30,8 +30,13 @@ class Model:
         x,y,z = 0,0,-1
         X,Y,Z = x+1,y+1,z+1
 
-        self.batch.add(4,GL_QUADS,self.side,('v3f',(x,y,z, X,y,z, X,Y,z, x,Y,z )),tex_coords)
-        self.batch.add(4,GL_QUADS,self.side,('v3f',(x,y,Z, X,y,Z, X,Y,Z, x,Y,Z )),tex_coords)
+        self.batch.add(4,GL_QUADS,self.side,('v3f',(x,y,z, X,y,z, X,Y,z, x,Y,z )),tex_coords)#front
+        self.batch.add(4,GL_QUADS,self.side,('v3f',(x,y,Z, X,y,Z, X,Y,Z, x,Y,Z )),tex_coords)#back
+        self.batch.add(4,GL_QUADS,self.side,('v3f',(x,y,z, X,y,z, X,y,Z, x,y,Z )),tex_coords)#bottom
+        self.batch.add(4,GL_QUADS,self.side,('v3f',(x,Y,z, X,Y,z, X,Y,Z, x,Y,Z )),tex_coords)#top
+        self.batch.add(4,GL_QUADS,self.side,('v3f',(x,y,z, x,Y,z, x,Y,Z, x,y,Z )),tex_coords)#left
+        self.batch.add(4,GL_QUADS,self.side,('v3f',(X,y,z, X,Y,z, X,Y,Z, X,y,Z )),tex_coords)#right
+        #self.batch.add(2,GL_LINES,('c3f',(0,0,0, 0,0,0)),('v3f',(X,Y,Z, 2*X,Y,Z)))
 
     def draw(self):
         self.batch.draw()
@@ -48,7 +53,7 @@ class Player:
         elif self.rot[0] < -90: self.rot[0] = -90
                 
     def update(self,dt,keys):
-        s = dt*10
+        s = dt*2
         rotY = -self.rot[1]/180*math.pi
         dx,dz = s*math.sin(rotY),s*math.cos(rotY)
         
@@ -61,6 +66,12 @@ class Player:
         if keys[key.LSHIFT]: self.pos[1] -= s
 
 class Window(pyglet.window.Window):
+    def push(self,pos,rot):
+        glPushMatrix()
+        glRotatef(-rot[0],1,0,0)
+        glRotatef(-rot[1],0,1,0)
+        glTranslatef(-pos[0],-pos[1],-pos[2])
+    
     def Projection(self):
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
@@ -95,7 +106,7 @@ class Window(pyglet.window.Window):
     def on_key_press(self,KEY,MOD):
         if KEY == key.ESCAPE:
             self.close()
-        elif KEY == key.SPACE:
+        elif KEY == key.E:
             self.mouse_lock = not self.mouse_lock
 
     def update(self,dt):
@@ -104,14 +115,12 @@ class Window(pyglet.window.Window):
     def on_draw(self):
         self.clear()
         self.set3D()
-        #glRotatef(-30,1,0,0)
-        x,y,z = self.player.pos
-        glTranslatef(-x,-y,-z)
-        glRotatef(-self.player.rot[0],1,0,0)
-        glRotatef(-self.player.rot[1],0,1,0)
+        self.push(self.player.pos,self.player.rot)
         self.model.draw()
+        glPopMatrix()
 
 window = Window(width=400,height=300,caption="cubes",resizable=True)
 glClearColor(0.5,0.7,0.7,1)
+glEnable(GL_DEPTH_TEST)
 
 pyglet.app.run()
