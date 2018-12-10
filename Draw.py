@@ -135,13 +135,13 @@ class Render:
         for i in range(0,len(cls.cube_queue)):
             a,b,c = cls.cube_queue[i]
             pygame.draw.polygon(cls.world_surface,c,b)
-
-        for i in range(0,len(cls.line_queue)):
-            b,c = cls.line_queue[i]
-            pygame.draw.line(cls.world_surface,c,b[0],b[1],5)
+        
+#        for i in range(0,len(cls.line_queue)):
+#            b,c = cls.line_queue[i]
+#            pygame.draw.line(cls.world_surface,c,b[0],b[1],5)
         cls.line_queue = []
 
-        for i in range(0,len(cls.cursor_queue)):
-            b,c = cls.cursor_queue[i]
-            pygame.draw.line(cls.world_surface,c,b[0],b[1],1)
+#        for i in range(0,len(cls.cursor_queue)):
+#            b,c = cls.cursor_queue[i]
+#            pygame.draw.line(cls.world_surface,c,b[0],b[1],1)
         cls.cursor_queue = []

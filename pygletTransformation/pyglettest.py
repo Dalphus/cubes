@@ -80,7 +80,7 @@ class Window(pyglet.window.Window):
         glLoadIdentity()
     def set3D(self):
         self.Projection()
-        gluPerspective(70,self.width/self.height,0.05,1000)
+        gluPerspective(60,self.width/self.height,0.05,1000)
         self.Model()
 
     def setLock(self,state):
@@ -119,7 +119,7 @@ class Window(pyglet.window.Window):
         self.model.draw()
         glPopMatrix()
 
-window = Window(width=400,height=300,caption="cubes",resizable=True)
+window = Window(width=1000,height=800,caption="cubes",resizable=True)
 glClearColor(0.5,0.7,0.7,1)
 glEnable(GL_DEPTH_TEST)
 
